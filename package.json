@@ -1,0 +1,16 @@
+{
+  "name": "rfid-door-opener",
+  "version": "0.1.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "push": "rsync -av --exclude '.git' --exclude 'node_modules' -e 'ssh -p 6007' . pi@diane.ai:/home/pi/rfid-door-opener",
+    "deploy": "npm run push"
+  },
+  "author": "valia fetisov",
+  "license": "MIT",
+  "dependencies": {
+    "rpi-gpio": "^2.1.2"
+  }
+}
