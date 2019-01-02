@@ -1,11 +1,21 @@
-const { read } = require('./lib/rfid')
+const { read, beep } = require('./lib/rfid')
 const { open } = require('./lib/phat')
+const delay = require('./lib/delay')
+
+const validCodes = ['0000000001']
 
 const loop = async function () {
   while (true) {
-    const text = read()
-    if (!text) continue
-    console.log('card detected', text)
+    const code = read()
+    if (!code) continue
+
+    console.log('card detected', code)
+    if (validCodes.indexOf(code) < 0) {
+      beep(3)
+      await delay(1000)
+      continue
+    }
+    beep(1)
     await open()
   }
 }
