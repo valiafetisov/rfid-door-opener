@@ -320,7 +320,7 @@ int init_protocol (struct libusb_device_handle *devh) {
   else if (verbose)
     fprintf (stdout, "init succeeded\n");
 
-  // usleep (500 * 1000);
+  usleep (500 * 1000);
 }
 
 int uninit_protocol (struct libusb_device_handle *devh) {
@@ -353,7 +353,7 @@ int send_message_async (struct libusb_device_handle *devh, uint8_t * message, ui
   if (libusb_submit_transfer (xfr_out) < 0)
     libusb_free_transfer (xfr_out);
   handle_events = 2;
-  // usleep (50 * 1000);
+  usleep (50 * 1000);
 
   while (handle_events) {
     if (libusb_handle_events (NULL) != LIBUSB_SUCCESS)
@@ -361,13 +361,13 @@ int send_message_async (struct libusb_device_handle *devh, uint8_t * message, ui
     if (verbose) fprintf (stdout, "event %d handled\n", handle_events);
   }
 
-  // usleep (100 * 1000);
+  usleep (100 * 1000);
 
   handle_events = 1;
   if (libusb_submit_transfer (xfr_in) < 0)
     libusb_free_transfer (xfr_in);
 
-  // usleep (50 * 1000);
+  usleep (50 * 1000);
 
   return 0;
 };
@@ -376,7 +376,7 @@ int send_read_em4100id (struct libusb_device_handle *devh) {
   uint8_t cmd[24] = { 0 };
 
   int cmd_answer_size = 0;
-  int retry_cnt = 10;
+  int retry_cnt = 1000;
 
   // flaky read, retry 10 times
   while ((cmd_answer_size < 5) && retry_cnt) {
@@ -637,10 +637,10 @@ int main (int argc, char **argv) {
   int write_device = 0;
   int format = AUTO_FORMAT;
   int buzzer = 0;
-  int semicolon = 0, questionmark = 0, split = 0, enter = 0;
+  int buzzer_no = 0;
   char *write_string = NULL;
 
-  while ((option = getopt (argc, argv, "w:vrb:sqlef:")) != -1) {
+  while ((option = getopt (argc, argv, "w:vrnbf:")) != -1) {
     switch (option) {
     case 'v':
       verbose = 1;
@@ -649,19 +649,10 @@ int main (int argc, char **argv) {
       read_device = 1;
       break;
     case 'b':
-      buzzer = optarg[0] + '0';
+      buzzer = 1;
       break;
-    case 's':
-      semicolon = 1;
-      break;
-    case 'q':
-      questionmark = 1;
-      break;
-    case 'l':
-      split = 1;
-      break;
-    case 'e':
-      enter = 1;
+    case 'n':
+      buzzer_no = 1;
       break;
     case 'f':
       format = atoi (optarg);
@@ -719,6 +710,11 @@ int main (int argc, char **argv) {
     send_buzzer (devh, 9);
   }
 
+  if (buzzer_no) {
+    send_buzzer (devh, 9);
+    send_buzzer (devh, 9);
+    send_buzzer (devh, 9);
+  }
 
   if (read_device) {
     send_read_em4100id (devh);

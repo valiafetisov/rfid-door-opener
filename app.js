@@ -11,11 +11,11 @@ const loop = async function () {
 
     console.log('card detected', code)
     if (validCodes.indexOf(code) < 0) {
-      beep(3)
+      beep(false)
       await delay(1000)
       continue
     }
-    beep(1)
+    beep(true)
     await open()
   }
 }
